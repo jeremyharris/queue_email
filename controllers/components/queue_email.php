@@ -62,27 +62,6 @@ class QueueEmailComponent extends EmailComponent {
 	}
 
 /**
- * Forces the email to queue instead of send if `$this->queue = true`
- *
- * @param mixed $content Either an array of text lines, or a string with
- *		contents If you are rendering a template this variable will be sent
- *		to the templates as `$content`
- * @param string $template Template to use when sending email
- * @param string $layout Layout to use to enclose email body
- * @return boolean Success
- * @access public
- */
-	function send($content = null, $template = null, $layout = null) {
-		if ($this->queue === true) {
-			$this->_oldDelivery = $this->delivery;
-			$this->delivery = 'db';
-		}
-		$success = parent::send($content, $template, $layout);
-		$this->delivery = $this->_oldDelivery;
-		return $success;
-	}
-
-/**
  * Stores emails in the database instead of sending them immediately
  *
  * @return boolean Success
@@ -95,7 +74,7 @@ class QueueEmailComponent extends EmailComponent {
 			'bcc' => serialize($this->bcc),
 			'from' => $this->from,
 			'subject' => $this->subject,
-			'delivery' => $this->_oldDelivery,
+			'delivery' => $this->delivery,
 			'smtp_options' => serialize($this->smtpOptions),
 			'message' => serialize($this->__message),
 			'header' => serialize($this->__header),
@@ -126,21 +105,46 @@ class QueueEmailComponent extends EmailComponent {
 	}
 
 /**
- * Override EmailComponent::_mail() to allow for testing
+ * Override EmailComponent::_mail() to queue the email instead
  *
  * @return boolean Success
  */
 	function _mail() {
-		return parent::_mail();
+		if ($this->queue === true) {
+			return $this->_db();
+		}
+		return $this->__mail();
 	}
 
+
 /**
- * Override EmailComponent::_smtp() to allow for testing
+ * Override EmailComponent::_smtp() to queue the email instead
  *
  * @return boolean Success
  */
 	function _smtp() {
+		if ($this->queue === true) {
+			return $this->_db();
+		}
+		return $this->__smtp();
+	}
+
+/**
+ * Intercepting function to allow for testing
+ *
+ * @return boolean Success
+ */
+	function __smtp() {
 		return parent::_smtp();
+	}
+
+/**
+ * Intercepting function to allow for testing
+ *
+ * @return boolean Success
+ */
+	function __mail() {
+		return parent::_mail();
 	}
 	
 } 

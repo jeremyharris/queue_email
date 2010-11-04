@@ -3,7 +3,7 @@ App::import('Core', 'Controller');
 App::import('Component', 'QueueEmail.QueueEmail');
 
 Mock::generatePartial('Controller', 'MockController', array('stop', 'header'));
-Mock::generatePartial('QueueEmailComponent', 'MockQueueEmailComponent', array('_smtp', '_mail'));
+Mock::generatePartial('QueueEmailComponent', 'MockQueueEmailComponent', array('__smtp', '__mail'));
 
 class QueueEmailComponentTestCase extends CakeTestCase {
 
@@ -15,8 +15,8 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 		$this->Controller = new MockController();
 		$this->QueueEmail = new MockQueueEmailComponent();
 		$this->QueueEmail->initialize($this->Controller);
-		$this->QueueEmail->setReturnValue('_mail', true);
-		$this->QueueEmail->setReturnValue('_smtp', true);
+		$this->QueueEmail->setReturnValue('__mail', true);
+		$this->QueueEmail->setReturnValue('__smtp', true);
 	}
 
 	function endTest() {
@@ -25,8 +25,8 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 	}
 
 	function testSend() {
-		$this->QueueEmail->expectNever('_mail');
-		$this->QueueEmail->expectNever('_smtp');
+		$this->QueueEmail->expectNever('__mail');
+		$this->QueueEmail->expectNever('__smtp');
 
 		$this->QueueEmail->to = 'test@test.com';
 		$this->QueueEmail->from = 'test@test.com';
@@ -37,7 +37,7 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 
 		$this->QueueEmail->reset();
 		$this->QueueEmail->to = 'test@test.com';
-		$this->QueueEmail->from = 'test@test.com';
+		$this->QueueEmail->from = 'testfrom@test.com';
 		$this->QueueEmail->subject = 'A queued Email';
 		$this->QueueEmail->delivery = 'smtp';
 		$this->QueueEmail->smtpOptions = array(
@@ -55,6 +55,19 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 			'password' => 'password'
 		)));
 
+		$result = unserialize($queue['Queue']['header']);
+		unset($result[3]);
+		$result = array_values($result);
+		$expected = array(
+			'To: test@test.com',
+			'From: testfrom@test.com',
+			'Subject: A queued Email',
+			'X-Mailer: CakePHP Email Component',
+			'Content-Type: text/plain; charset=UTF-8',
+			'Content-Transfer-Encoding: 7bit'
+		);
+		$this->assertEqual($result, $expected);
+
 		$this->QueueEmail->reset();
 		$this->QueueEmail->to = 'test@test.com';
 		$this->QueueEmail->from = 'test@test.com';
@@ -71,7 +84,7 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 		$this->assertEqual($result, $expected);
 
 		$result = unserialize($queue['Queue']['header']);
-		$expected = 'From: test@test.com';
+		$expected = 'To: test@test.com';
 		$this->assertEqual($result[0], $expected);
 	}
 
@@ -121,7 +134,7 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 	}
 
 	function testSendWithoutQueue() {
-		$this->QueueEmail->expectOnce('_mail');
+		$this->QueueEmail->expectOnce('__mail');
 		$this->QueueEmail->queue = false;
 		$this->assertTrue($this->QueueEmail->send());
 	}
