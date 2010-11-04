@@ -2,8 +2,8 @@
 /**
  * Queues controller class.
  *
- * @copyright     Copyright 2010, *ROCK*HARBOR
- * @link          http://rockharbor.org *ROCK*HARBOR
+ * @copyright     Copyright 2010, Jeremy Harris
+ * @link          http://42pixels.com
  * @package       queue_email
  * @subpackage    queue_email
  */
