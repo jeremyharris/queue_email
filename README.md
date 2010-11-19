@@ -62,3 +62,11 @@ of that. If you have suggestions to avoid this let me know.
 ## Future
 
 * Add ability to send one or multiple emails from the management console.
+
+## License
+
+Licensed under The MIT License
+[http://www.opensource.org/licenses/mit-license.php][1]
+Redistributions of files must retain the above copyright notice.
+
+[1]: http://www.opensource.org/licenses/mit-license.php

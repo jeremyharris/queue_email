@@ -2,10 +2,14 @@
 /**
  * Queues table schema
  *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
  * @copyright     Copyright 2010, Jeremy Harris
  * @link          http://42pixels.com
  * @package       queue_email
  * @subpackage    queue_email.config.schema
+ * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
 /**
