@@ -41,6 +41,7 @@ class QueueSchema extends CakeSchema {
 		'message' => array('type' => 'text', 'text' => NULL),
 		'header' => array('type' => 'text', 'text' => NULL),
 		'attempts' => array('type' => 'text', 'text' => NULL),
+		'success' => array('type' => 'integer', 'length' => 1),
 		'created' => array('type' => 'datetime', 'default' => NULL),
 		'modified' => array('type' => 'datetime', 'default' => NULL),
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),

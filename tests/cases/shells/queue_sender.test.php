@@ -129,6 +129,27 @@ class QueueSenderShellTestCase extends CakeTestCase {
 		$results = $this->Shell->Queue->field('attempts');
 		$this->assertEqual($results, 2);
 	}
+	
+	function testSaveEmails() {
+		Configure::write('QueueEmail.deleteAfter', false);
+		
+		$this->Shell->args[0] = 3;
+		$this->Shell->send();
+		$count = $this->Shell->Queue->find('count');
+		$this->assertEqual($count, 4);
+		
+		$this->Shell->Queue->id = 3;
+		$queue = $this->Shell->Queue->read();
+		$result = $queue['Queue']['success'];
+		$this->assertTrue($result);
+		$result = $queue['Queue']['attempts'];
+		$this->assertEqual($result, 1);
+		
+		$this->Shell->Email->expectNever('_mail');
+		$this->Shell->Email->expectNever('_smtp');
+		$this->Shell->args[0] = 3;
+		$this->Shell->send();
+	}
 
 }
 
