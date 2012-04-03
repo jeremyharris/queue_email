@@ -91,47 +91,18 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 
 	function testInterpret() {
 		$result = $this->QueueEmail->interpret($this->QueueEmail->Model->read(null, 1));
-		$expected = array(
-			'Queue' => array(
-				'id' => 1,
-				'to' => 'test@test.com',
-				'cc' => null,
-				'bcc' => null,
-				'from' => 'test@test.com',
-				'subject' => 'Mail',
-				'delivery' => null,
-				'smtp_options' => null,
-				'message' => null,
-				'header' => null,
-				'created' => '2010-09-20 00:00:01',
-				'modified' => '2010-09-20 00:00:01',
-			)
-		);
-		$this->assertEqual($result, $expected);
+		$results = $result['Queue']['smtp_options'];
+		$this->assertEqual($results, null);
 
 		$result = $this->QueueEmail->interpret($this->QueueEmail->Model->read(null, 2));
+		$results = $result['Queue']['smtp_options'];
 		$expected = array(
-			'Queue' => array(
-				'id' => 2,
-				'to' => 'test@test.com',
-				'cc' => null,
-				'bcc' => null,
-				'from' => 'test@test.com',
-				'subject' => 'Mail',
-				'delivery' => 'smtp',
-				'smtp_options' => array(
-					'port' => 25,
-					'host' => 'example.smtp.server',
-					'username' => 'username',
-					'password' => 'password',
-				),
-				'message' => null,
-				'header' => null,
-				'created' => '2010-09-20 00:00:01',
-				'modified' => '2010-09-20 00:00:01',
-			)
+			'port' => 25,
+			'host' => 'example.smtp.server',
+			'username' => 'username',
+			'password' => 'password',
 		);
-		$this->assertEqual($result, $expected);
+		$this->assertEqual($results, $expected);
 	}
 
 	function testSendWithoutQueue() {
