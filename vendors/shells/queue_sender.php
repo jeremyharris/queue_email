@@ -163,8 +163,6 @@ class QueueSenderShell extends Shell {
  */
 	function _send($results) {
 		$this->_reset();
-		$this->Controller->viewVars = @unserialize($results['Queue']['view_vars']);
-		unset($results['Queue']['view_vars']);
 
 		// attach non-null values to their EmailComponent variable counterpart
 		foreach ($results['Queue'] as $var => $val) {
