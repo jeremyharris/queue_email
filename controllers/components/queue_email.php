@@ -82,6 +82,7 @@ class QueueEmailComponent extends EmailComponent {
 			'smtp_options' => serialize($this->smtpOptions),
 			'message' => serialize($this->__message),
 			'header' => serialize($this->__header),
+			'attempts' => 0
 		));
 	}
 

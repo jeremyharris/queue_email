@@ -42,6 +42,11 @@ id directly after the send method, as such
 
 Would send email number 12.
 
+The shell will try to send the email a maximum of 5 times. You can change this by
+setting the `-maxAttempts` parameter
+
+    /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -maxAttempts 10
+
 If you have emails you don't want to queue, simply change the `$queue` var to
 false.
 

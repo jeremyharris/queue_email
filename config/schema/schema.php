@@ -40,6 +40,7 @@ class QueueSchema extends CakeSchema {
 		'smtp_options' => array('type' => 'text', 'default' => NULL),
 		'message' => array('type' => 'text', 'text' => NULL),
 		'header' => array('type' => 'text', 'text' => NULL),
+		'attempts' => array('type' => 'text', 'text' => NULL),
 		'created' => array('type' => 'datetime', 'default' => NULL),
 		'modified' => array('type' => 'datetime', 'default' => NULL),
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),

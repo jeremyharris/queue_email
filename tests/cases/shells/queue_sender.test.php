@@ -73,6 +73,14 @@ class QueueSenderShellTestCase extends CakeTestCase {
 	function testSendBothParams() {
 		Configure::write('QueueEmail.batchSize', 1);
 		$this->Shell->params['batchSize'] = 2;
+		$this->Shell->params['maxAttempts'] = 1;
+		$this->Shell->send();
+		$count = $this->Shell->Queue->find('count');
+		$this->assertEqual($count, 2);
+		
+		$this->Shell->params['batchSize'] = 2;
+		$this->Shell->params['maxAttempts'] = 1;
+		$this->Shell->args[0] = 4;
 		$this->Shell->send();
 		$count = $this->Shell->Queue->find('count');
 		$this->assertEqual($count, 2);
@@ -98,6 +106,28 @@ class QueueSenderShellTestCase extends CakeTestCase {
 			'username' => 'username',
 			'password' => 'password'
 		));
+	}
+	
+	function testCountAttempts() {
+		$this->Shell->Email = new MockEmailComponent();
+		$this->Shell->Email->initialize($this->Task->Controller);
+		
+		$this->Shell->Email->setReturnValueAt(0, '_mail', false);
+		$this->Shell->Email->setReturnValueAt(0, '_smtp', true);
+		$this->Shell->Email->setReturnValueAt(1, '_mail', true);
+		$this->Shell->Email->setReturnValueAt(2, '_mail', false);
+		
+		$this->Shell->send();
+		$count = $this->Shell->Queue->find('count');
+		$this->assertEqual($count, 2);
+		
+		$this->Shell->Queue->id = 1;
+		$results = $this->Shell->Queue->field('attempts');
+		$this->assertEqual($results, 1);
+		
+		$this->Shell->Queue->id = 4;
+		$results = $this->Shell->Queue->field('attempts');
+		$this->assertEqual($results, 2);
 	}
 
 }

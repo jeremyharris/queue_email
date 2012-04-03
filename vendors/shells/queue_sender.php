@@ -38,6 +38,18 @@ class QueueSenderShell extends Shell {
  * @var integer
  */
 	var $limit = 50;
+	
+/**
+ * Default maximum attempts. Customize this by setting
+ * {{{
+ * Configure::write('QueueEmail.maxAttempts', 10);
+ * }}}
+ * 
+ * Or by passing `-maxAttempts <number>` to the shell
+ * 
+ * @var type 
+ */
+	var $maxAttempts = 5;
 
 /**
  * Startup function
@@ -56,7 +68,7 @@ class QueueSenderShell extends Shell {
  */
 	function main() {
 		$out  = "Available QueueEmail commands:"."\n";
-		$out .= "\t - send \$id -batchSize \$size\n";
+		$out .= "\t - send \$id -batchSize \$size -maxAttempts \$attempts\n";
 		$out .= "\t - help\n\n";
 		$out .= "For help, run the 'help' command.  For help on a specific command, run 'help <command>'";
 		$this->out($out);
@@ -75,14 +87,14 @@ class QueueSenderShell extends Shell {
 
 		if (empty($command)) {
 			$out  = "Available QueueEmail commands:"."\n";
-			$out .= "\t - send \$id -batchSize \$size\n";
+			$out .= "\t - send \$id -batchSize \$size -maxAttempts \$attempts\n";
 			$out .= "\t - help\n\n";
 			$out .= "For help, run the 'help' command.  For help on a specific command, run 'help <command>'";
 			$this->out($out);
 		} else {
 			switch ($command) {
 				case 'send':
-				$out .= "\tcake queue_email send \$id -batchSize \$size\n";
+				$out .= "\tcake queue_email send \$id -batchSize \$size -maxAttempts \$attempts\n";
 				$out .= "\t\tSends a batch of emails as defined by Configure::read('QueueEmail.batchSize').\n";
 				$out .= "\t\tYou may also overwrite that size by passing a number to the switch -batchSize.\n";
 				$out .= "\t\tIf \$id is passed, it will send that single email instead.\n";
@@ -104,35 +116,37 @@ class QueueSenderShell extends Shell {
  *
  * ### Params
  * - `batchSize` Overrides default and configured batch size 
+ * - `maxAttempts` Overrides default and configured maximum attempts
  */
 	function send() {
 		if (!empty($this->args[0])) {
-			if ($this->_send($this->Queue->read(null, $this->args[0]))) {
-				$this->out('Sent email #'.$this->args[0].' successfully!');
-				$this->Queue->delete($this->args[0]);
-			} else {
-				$this->out('Error sending email #'.$this->args[0].'!');
-			}
-			$this->_stop();
-			return;
+			$conditions = array(
+				'id' => $this->args[0]
+			);
 		}
 
-		$limit = $this->limit;
-		if (Configure::read('QueueEmail.batchSize') !== null) {
-			$limit = Configure::read('QueueEmail.batchSize');
-		}
-		if (isset($this->params['batchSize'])) {
-			$limit = $this->params['batchSize'];
-		}
-
+		$defaults = array(
+			'batchSize' => $this->limit,
+			'maxAttempts' => $this->maxAttempts
+		);
+		$config = Configure::read('QueueEmail');
+		$config = array_merge($defaults, (array)$config, (array)$this->params);
+		
+		$conditions['attempts <'] = $config['maxAttempts'];
+		
 		// get batch
-		$emails = $this->Queue->find('all', array('limit' => $limit));
+		$emails = $this->Queue->find('all', array(
+			'limit' => $config['batchSize'],
+			'conditions' => $conditions
+		));
 
 		foreach ($emails as $email) {
 			if ($this->_send($email)) {
 				$this->out('Sent email #'.$email['Queue']['id'].' successfully!');
 				$this->Queue->delete($email['Queue']['id']);
 			} else {
+				$this->Queue->id = $email['Queue']['id'];
+				$this->Queue->saveField('attempts', (int)$email['Queue']['attempts']+1);
 				$this->out('Error sending email #'.$email['Queue']['id'].'!');
 			}
 		}
