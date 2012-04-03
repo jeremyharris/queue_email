@@ -31,8 +31,11 @@ job to execute the shell every 5 minutes.
     /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send
 
 By default, the shell sends out 50 at a time. You can change this by passing the
-`-batchSize` parameter
+`-batchSize` parameter or by setting the configure option 
 
+    // using Configure
+    Configure::write('QueueEmail.batchSize', 100);
+    // using the shell argument
     /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -batchSize 100
 
 This would send 100 emails. You can also send individual emails by passing the
@@ -43,8 +46,11 @@ id directly after the send method, as such
 Would send email number 12.
 
 The shell will try to send the email a maximum of 5 times. You can change this by
-setting the `-maxAttempts` parameter
+setting the `-maxAttempts` parameter or by setting the configure option 
 
+    // using Configure
+    Configure::write('QueueEmail.maxAttempts', 10);
+    // using the shell argument
     /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -maxAttempts 10
 
 If you have emails you don't want to queue, simply change the `$queue` var to
