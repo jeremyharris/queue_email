@@ -30,28 +30,10 @@ job to execute the shell every 5 minutes.
 
     /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send
 
-By default, the shell sends out 50 at a time. You can change this by passing the
-`-batchSize` parameter or by setting the configure option 
-
-    // using Configure
-    Configure::write('QueueEmail.batchSize', 100);
-    // using the shell argument
-    /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -batchSize 100
-
-This would send 100 emails. You can also send individual emails by passing the
-id directly after the send method, as such
+You can also send individual emails by passing the id directly after the send 
+method:
 
     /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send 12
-
-Would send email number 12.
-
-The shell will try to send the email a maximum of 5 times. You can change this by
-setting the `-maxAttempts` parameter or by setting the configure option 
-
-    // using Configure
-    Configure::write('QueueEmail.maxAttempts', 10);
-    // using the shell argument
-    /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -maxAttempts 10
 
 If you have emails you don't want to queue, simply change the `$queue` var to
 false.
@@ -59,6 +41,23 @@ false.
     $this->QueueEmail->queue = false; // this email won't be queued
 
 This will send the email as the regular EmailComponent normally would.
+
+### Options
+
+The shell supports several options, described below. You can pass them directly
+via the CLI, or by setting its value in the `Configure` class.
+
+* `batchSize` Limit the number of queued emails sent at time. Default 50.
+* `maxTries` Limit the number of send attempts. Default 5.
+* `deleteAfter` Remove the record from the db after it sends successfully. Default `true`.
+
+Setting using the shell:
+    
+    /path/to/site/cake/console/cake -app "/path/to/site/app" queue_sender send -batchSize 100
+
+Setting using `Configure`:
+
+    Configure::write('QueueEmail.batchSize', 100);
 
 ## Managing
 
