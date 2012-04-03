@@ -57,6 +57,7 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 
 		$result = unserialize($queue['Queue']['header']);
 		unset($result[3]);
+		unset($result[4]);
 		$result = array_values($result);
 		$expected = array(
 			'To: test@test.com',
