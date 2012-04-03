@@ -35,6 +35,8 @@ class QueueSenderShell extends Shell {
  * Configure::write('QueueEmail.batchSize', 25);
  * }}}
  * 
+ * Or by passing `-batchSize <number>` to the shell
+ * 
  * @var integer
  */
 	var $limit = 50;
