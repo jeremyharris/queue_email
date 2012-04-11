@@ -140,8 +140,8 @@ class QueueSenderShellTestCase extends CakeTestCase {
 		
 		$this->Shell->Queue->id = 3;
 		$queue = $this->Shell->Queue->read();
-		$result = $queue['Queue']['success'];
-		$this->assertTrue($result);
+		$result = $queue['Queue']['status'];
+		$this->assertEqual($result, 1);
 		$result = $queue['Queue']['attempts'];
 		$this->assertEqual($result, 1);
 		
@@ -149,6 +149,22 @@ class QueueSenderShellTestCase extends CakeTestCase {
 		$this->Shell->Email->expectNever('_smtp');
 		$this->Shell->args[0] = 3;
 		$this->Shell->send();
+	}
+	
+	function testPreventFindOverlap() {
+		$this->Shell->Queue->id = 1;
+		$this->Shell->Queue->saveField('status', 2);
+		
+		$this->Shell->send();
+		$count = $this->Shell->Queue->find('count');
+		$this->assertEqual($count, 1);
+		
+		$this->Shell->Queue->id = 1;
+		$this->Shell->Queue->saveField('status', 0);
+		
+		$this->Shell->send();
+		$count = $this->Shell->Queue->find('count');
+		$this->assertEqual($count, 0);
 	}
 
 }

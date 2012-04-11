@@ -149,13 +149,19 @@ class QueueSenderShell extends Shell {
 		$config = array_merge($defaults, (array)$config, (array)$this->params);
 		
 		$conditions['attempts <'] = $config['maxAttempts'];
-		$conditions['success'] = false;
+		$conditions['status'] = 0;
 		
 		// get batch
 		$emails = $this->Queue->find('all', array(
 			'limit' => $config['batchSize'],
 			'conditions' => $conditions
 		));
+		
+		// update the status so they don't get pulled by another job
+		$this->Queue->updateAll(
+			array('Queue.status' => 2),
+			array('Queue.id' => Set::extract('/Queue/id', $emails))
+		);
 
 		foreach ($emails as $email) {
 			$this->Queue->id = $email['Queue']['id'];
@@ -165,11 +171,12 @@ class QueueSenderShell extends Shell {
 					$this->Queue->delete();
 				} else {
 					$this->Queue->saveField('attempts', (int)$email['Queue']['attempts']+1);
-					$this->Queue->saveField('success', true);
+					$this->Queue->saveField('status', 1);
 				}
 			} else {
 				$this->Queue->id = $email['Queue']['id'];
 				$this->Queue->saveField('attempts', (int)$email['Queue']['attempts']+1);
+				$this->Queue->saveField('status', 0);
 				$this->out('Error sending email #'.$email['Queue']['id'].'!');
 			}
 		}
