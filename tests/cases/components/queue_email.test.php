@@ -103,6 +103,18 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 			'password' => 'password',
 		);
 		$this->assertEqual($results, $expected);
+		
+		$result = $this->QueueEmail->interpret($this->QueueEmail->Model->read(null, 3));
+		$results = implode(PHP_EOL, $result['Queue']['message']);
+		$expected = <<<HTML
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<body>
+<p>This is a test <strong>with</strong> html.</p>
+</body>
+</html>
+HTML;
+		$this->assertEqual($results, $expected);
 	}
 
 	function testSendWithoutQueue() {
