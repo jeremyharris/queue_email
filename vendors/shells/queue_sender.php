@@ -198,7 +198,8 @@ class QueueSenderShell extends Shell {
 				if (@unserialize($val) !== false) {
 					$val = unserialize($val);
 				}
-				$varName = lcfirst(Inflector::camelize($var));
+				$varName = Inflector::camelize($var);
+				$varName = strtolower(substr($varName, 0, 1)) . substr($varName, 1);
 				if (in_array($varName, array('header', 'message'))) {
 					$varName = '__'.$varName;
 				}
