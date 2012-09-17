@@ -92,12 +92,14 @@ class QueueEmailComponent extends EmailComponent {
  * @param array $message The message
  * @return array
  */
-	function interpret($message = array()) {
+	function interpret($message = array(), $modelAlias = 'Queue') {
 		if (empty($message)) {
 			return false;
 		}
-		if (isset($message['Queue'])) {
-			$message = $message['Queue'];
+		if (isset($message[$modelAlias])) {
+			$message = $message[$modelAlias];
+		} else {
+			return $message;
 		}
 		foreach ($message as $field => &$value) {
 			if (@unserialize($value) !== false) {
@@ -105,7 +107,7 @@ class QueueEmailComponent extends EmailComponent {
 			}
 		}
 		return array(
-			'Queue' => $message
+			$modelAlias => $message
 		);
 	}
 

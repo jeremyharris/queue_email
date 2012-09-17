@@ -115,6 +115,28 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 </html>
 HTML;
 		$this->assertEqual($results, $expected);
+		
+		$myAlias = new Model(array(
+			'name' => 'QueueEmail.Queue',
+			'alias' => 'MyAlias',
+			'table' => 'queues',
+			'ds' => 'test_suite'
+		));
+		
+		$result = $this->QueueEmail->interpret($myAlias->read(null, 2));
+		$results = $result['MyAlias']['smtp_options'];
+		$expected = 'a:4:{s:4:"port";i:25;s:4:"host";s:19:"example.smtp.server";s:8:"username";s:8:"username";s:8:"password";s:8:"password";}';
+		$this->assertEqual($results, $expected);
+		
+		$result = $this->QueueEmail->interpret($myAlias->read(null, 2), 'MyAlias');
+		$results = $result['MyAlias']['smtp_options'];
+		$expected = array(
+			'port' => 25,
+			'host' => 'example.smtp.server',
+			'username' => 'username',
+			'password' => 'password',
+		);
+		$this->assertEqual($results, $expected);
 	}
 
 	function testSendWithoutQueue() {
