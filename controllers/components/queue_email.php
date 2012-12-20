@@ -97,18 +97,21 @@ class QueueEmailComponent extends EmailComponent {
 			return false;
 		}
 		if (isset($message[$modelAlias])) {
-			$message = $message[$modelAlias];
+			$data = $message[$modelAlias];
 		} else {
-			return $message;
+			$data = $message;
 		}
-		foreach ($message as $field => &$value) {
+		foreach ($data as $field => &$value) {
 			if (@unserialize($value) !== false) {
 				$value = unserialize($value);
 			}
 		}
-		return array(
-			$modelAlias => $message
-		);
+		if (isset($message[$modelAlias])) {
+			$message[$modelAlias] = $data;
+		} else {
+			$message = $data;
+		}
+		return $message;
 	}
 
 /**

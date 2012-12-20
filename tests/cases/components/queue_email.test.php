@@ -137,6 +137,21 @@ HTML;
 			'password' => 'password',
 		);
 		$this->assertEqual($results, $expected);
+		
+		$data = $this->QueueEmail->Model->read(null, 2);
+		$data['ExtraModel'] = array(
+			'id' => 1
+		);
+		
+		$email = $this->QueueEmail->interpret($data);
+		$this->assertTrue(isset($email['ExtraModel']));
+		
+		$result = $email['Queue']['smtp_options'];
+		$this->assertIsA($result, 'Array');
+		
+		$email = $this->QueueEmail->interpret($data['Queue']);
+		$result = $email['smtp_options'];
+		$this->assertIsA($result, 'Array');
 	}
 
 	function testSendWithoutQueue() {
