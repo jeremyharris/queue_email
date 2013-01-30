@@ -23,6 +23,25 @@ class QueueEmailComponentTestCase extends CakeTestCase {
 		unset($this->Controller);
 		unset($this->QueueEmail);
 	}
+	
+	function testSendWithAttachment() {
+		$this->QueueEmail->expectNever('__mail');
+		$this->QueueEmail->expectNever('__smtp');
+		
+		$this->QueueEmail->to = 'test@test.com';
+		$this->QueueEmail->from = 'test@test.com';
+		$this->QueueEmail->subject = 'A queued Email';
+		$this->QueueEmail->attachments = array(
+			__FILE__
+		);
+		$this->QueueEmail->send();
+		
+		$queue = $this->QueueEmail->Model->read();
+		$queue = $this->QueueEmail->interpret($queue);
+		
+		$result = $queue['Queue']['message'];
+		$this->assertTrue(in_array('Content-Transfer-Encoding: base64', $result));
+	}
 
 	function testSend() {
 		$this->QueueEmail->expectNever('__mail');
