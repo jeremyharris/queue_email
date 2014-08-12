@@ -1,3 +1,6 @@
+> This plugin is deprecated and no longer maintained in favor of more robust solutions, such as
+> proper job queuing plugins like [CakeResque](https://github.com/kamisama/Cake-Resque).
+
 # QueueEmail
 
 QueueEmail is a CakePHP plugin that allows you to queue emails in your database
