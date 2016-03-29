@@ -1,5 +1,7 @@
 > This plugin is deprecated and no longer maintained in favor of more robust solutions, such as
 > proper job queuing plugins like [CakeResque](https://github.com/kamisama/Cake-Resque).
+> I also suggest trying out [jose_zap/cakephp-email-queue](https://github.com/lorenzo/cakephp-email-queue)
+> which operates much like this plugin.
 
 # QueueEmail
 
